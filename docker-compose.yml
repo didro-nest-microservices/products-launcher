@@ -1,23 +1,20 @@
 services:
   nats-server:
     image: nats
-    ports:
-      - 8222:8222
   client-gateway:
     build: ./client-gateway
+    image: client-gateway-prd
     ports:
       - ${CLIENT_GATEWAY_PORT}:3000
-    volumes:
-      - ./client-gateway/src:/usr/src/app/src
-    command: npm run start:dev
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
   auth-ms:
-    build: ./auth-ms
-    volumes:
-      - ./auth-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    build:
+      context: ./auth-ms
+      args:
+        - AUTH_MS_DATABASE_URL=${AUTH_MS_DATABASE_URL}
+    image: auth-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
@@ -25,42 +22,26 @@ services:
       - JWT_SECRET=${JWT_SECRET}
   products-ms:
     build: ./products-ms
-    volumes:
-      - ./products-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    image: products-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
       - DATABASE_URL=file:./dev.db
   orders-ms:
-    build: ./orders-ms
-    volumes:
-      - ./orders-ms/src:/usr/src/app/src
-    command: npm run start:dev
+    build:
+      context: ./orders-ms
+      args:
+        - ORDERS_MS_DATABASE_URL=${ORDERS_MS_DATABASE_URL}
+    image: orders-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
       - DATABASE_URL=${ORDERS_MS_DATABASE_URL}
-    depends_on:
-      - orders-db
-  orders-db:
-    image: postgres:16.2
-    restart: always
-    volumes:
-      - ./orders-ms/postgres:/var/lib/postgresql/data
-    ports:
-      - 5430:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=orders
   payments-ms:
     build: ./payments-ms
+    image: payments-ms-prd
     ports:
       - 3003:3000
-    volumes:
-      - ./payments-ms/src:/usr/src/app/src
-    command: npm run start:dev
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
