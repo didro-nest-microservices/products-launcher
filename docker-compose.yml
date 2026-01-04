@@ -3,7 +3,7 @@ services:
     image: nats
   client-gateway:
     build: ./client-gateway
-    image: client-gateway-prd
+    image: southamerica-east1-docker.pkg.dev/shop-ms-482816/image-registry/client-gateway-prd
     ports:
       - ${CLIENT_GATEWAY_PORT}:3000
     environment:
@@ -14,7 +14,7 @@ services:
       context: ./auth-ms
       args:
         - AUTH_MS_DATABASE_URL=${AUTH_MS_DATABASE_URL}
-    image: auth-ms-prd
+    image: southamerica-east1-docker.pkg.dev/shop-ms-482816/image-registry/auth-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
@@ -22,7 +22,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
   products-ms:
     build: ./products-ms
-    image: products-ms-prd
+    image: southamerica-east1-docker.pkg.dev/shop-ms-482816/image-registry/products-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
@@ -32,14 +32,14 @@ services:
       context: ./orders-ms
       args:
         - ORDERS_MS_DATABASE_URL=${ORDERS_MS_DATABASE_URL}
-    image: orders-ms-prd
+    image: southamerica-east1-docker.pkg.dev/shop-ms-482816/image-registry/orders-ms-prd
     environment:
       - PORT=3000
       - NATS_SERVER=nats://nats-server:4222
       - DATABASE_URL=${ORDERS_MS_DATABASE_URL}
   payments-ms:
     build: ./payments-ms
-    image: payments-ms-prd
+    image: southamerica-east1-docker.pkg.dev/shop-ms-482816/image-registry/payments-ms-prd
     ports:
       - 3003:3000
     environment:
